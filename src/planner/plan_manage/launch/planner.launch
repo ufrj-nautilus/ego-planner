@@ -86,4 +86,15 @@
     <remap from="~traj_start_trigger" to="/traj_start_trigger" />
     <param name="waypoint_type" value="manual-lonely-waypoint"/>    
   </node>
+
+  <node pkg="plan_manage" name="camera_pose_publisher" type="camera_pose_publisher.py" output="screen">
+      <param name="parent_frame" value="world" />
+      <param name="child_frame" value="$(arg mav_name)/camera" />
+      <param name="pose_topic" value="$(arg mav_name)/camera/pose" />
+  </node>
+
+  <node pkg="plan_manage" name="trajectory_msg_converter" type="trajectory_msg_converter.py" output="screen">
+      <param name="fast_planner_traj_topic" value="planning/pos_cmd"/>
+      <param name="traj_pub_topic" value="$(arg mav_name)/position_hold/trajectory"/>
+  </node>
 </launch>
