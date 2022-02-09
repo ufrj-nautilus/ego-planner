@@ -89,7 +89,7 @@
 
   <node pkg="ego_planner" name="camera_pose_publisher" type="camera_pose_publisher.py" output="screen">
       <param name="parent_frame" value="world" />
-      <param name="child_frame" value="$(arg mav_name)/camera" />
+      <param name="child_frame" value="$(arg mav_name)/camera_box" />
       <param name="pose_topic" value="$(arg mav_name)/camera/pose" />
   </node>
 

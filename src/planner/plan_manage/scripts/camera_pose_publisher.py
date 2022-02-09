@@ -11,7 +11,7 @@ if __name__ == '__main__':
     rospy.init_node('camera_pose_publisher')
 
     parent_frame = rospy.get_param('~parent_frame', 'world')
-    camera_frame = rospy.get_param('~child_frame','red/camera')
+    camera_frame = rospy.get_param('~child_frame','red/camera_box')
     pose_topic = rospy.get_param('~pose_topic','red/camera/pose')
 
     pose_pub = rospy.Publisher(pose_topic, PoseStamped, queue_size=10)
