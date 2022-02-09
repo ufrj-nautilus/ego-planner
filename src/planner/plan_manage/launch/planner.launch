@@ -6,7 +6,7 @@
   <arg name="map_size_y" default="16.0"/>
   <arg name="map_size_z" default="5.0"/>
 
-  <arg name="odom_topic" default="$(arg mav_name)/odometry" />
+  <arg name="odom_topic" default="mavros/global_position/local" />
   <arg name="camera_pose_topic" default="$(arg mav_name)/camera/pose"/>
   <arg name="depth_topic" default="$(arg mav_name)/camera/depth/image_raw"/>
 
