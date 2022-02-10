@@ -6,11 +6,11 @@
   <arg name="map_size_y" default="16.0"/>
   <arg name="map_size_z" default="5.0"/>
 
-  <arg name="odom_topic" default="$(arg mav_name)/odometry" />
+  <arg name="odom_topic" default="$(arg mav_name)/mavros/global_position/local" />
   <arg name="camera_pose_topic" default="$(arg mav_name)/camera/pose"/>
   <arg name="depth_topic" default="$(arg mav_name)/camera/depth/image_raw"/>
 
-  <node pkg="tf" type="static_transform_publisher" name="camera_reverter_broadcaster" args="0 0 0 -1.57 0 -1.57 $(arg mav_name)/camera_box $(arg mav_name)/camera_box_reverse 33"/>
+  <node pkg="tf" type="static_transform_publisher" name="camera_reverter_broadcaster" args="0 0 0 -1.57 0 -1.57 base_link camera_box_reverse 33"/>
 
   <!-- main algorithm params -->
   <include file="$(find ego_planner)/launch/advanced_param.xml">
@@ -91,7 +91,7 @@
 
   <node pkg="ego_planner" name="camera_pose_publisher" type="camera_pose_publisher.py" output="screen">
       <param name="parent_frame" value="world" />
-      <param name="child_frame" value="$(arg mav_name)/camera_box_reverse" />
+      <param name="child_frame" value="camera_box_reverse" />
       <param name="pose_topic" value="$(arg mav_name)/camera/pose" />
   </node>
 
