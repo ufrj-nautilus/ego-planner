@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 """@trajectory_msg_converter.py
-This node converts Fast-Planner reference trajectory message to MultiDOFJointTrajectory which is accepted by UAV position control
+This node converts Ego-Planner reference trajectory message to MultiDOFJointTrajectory which is accepted by TOPP-RA
 Author: Mohamed Abdelkader
 Modifications: Lucca Gandra
 """
 
 # Imports
 import rospy
-from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint # for UAV position control
-from quadrotor_msgs.msg import PositionCommand # for Fast-Planner
+from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint # for TOPP-RA
+from quadrotor_msgs.msg import PositionCommand # for Ego-Planner
 from geometry_msgs.msg import Transform, Twist
 from tf.transformations import quaternion_from_euler
 
@@ -18,17 +18,17 @@ class MessageConverter:
         rospy.init_node('trajectory_msg_converter')
 
         fast_planner_traj_topic = rospy.get_param('~fast_planner_traj_topic', 'planning/pos_cmd')
-        traj_pub_topic = rospy.get_param('~traj_pub_topic', 'red/position_hold/trajectory')
+        traj_pub_topic = rospy.get_param('~traj_pub_topic', 'red/tracker/input_trajectory')
 
-        # Publisher for UAV position control
-        self.traj_pub = rospy.Publisher(traj_pub_topic, MultiDOFJointTrajectoryPoint, queue_size=50)
+        # Publisher for TOPP-RA
+        self.traj_pub = rospy.Publisher(traj_pub_topic, MultiDOFJointTrajectory, queue_size=1)
 
         # Subscriber for Fast-Planner reference trajectory
-        rospy.Subscriber(fast_planner_traj_topic, PositionCommand, self.fastPlannerTrajCallback, tcp_nodelay=True)
+        rospy.Subscriber(fast_planner_traj_topic, PositionCommand, self.egoPlannerTrajCallback, tcp_nodelay=True)
 
         rospy.spin()
 
-    def fastPlannerTrajCallback(self, msg):
+    def egoPlannerTrajCallback(self, msg):
         # position and yaw
         pose = Transform()
         pose.translation.x = msg.position.x
@@ -54,7 +54,11 @@ class MessageConverter:
         traj_point.velocities.append(vel)
         traj_point.accelerations.append(acc)
 
-        self.traj_pub.publish(traj_point)
+        traj_msg = MultiDOFJointTrajectory()
+
+        traj_msg.header = msg.header
+        traj_msg.points.append(traj_point)
+        self.traj_pub.publish(traj_msg)
 
 if __name__ == '__main__':
     obj = MessageConverter()

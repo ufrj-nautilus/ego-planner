@@ -4,11 +4,9 @@
   <!-- Size of Challenge, in meters (ICUAS-Simulation) -->
   <arg name="map_size_x" default="25.0"/>
   <arg name="map_size_y" default="16.0"/>
-  <arg name="map_size_z" default="5.0"/>
+  <arg name="map_size_z" default="6.0"/>
 
   <arg name="odom_topic" default="$(arg mav_name)/odometry" />
-  <arg name="camera_pose_topic" default="$(arg mav_name)/camera/pose"/>
-  <arg name="depth_topic" default="$(arg mav_name)/camera/depth/image_raw"/>
 
   <!-- main algorithm params -->
   <include file="$(find ego_planner)/launch/advanced_param.xml">
@@ -21,8 +19,8 @@
     <!-- camera pose: transform of camera frame in the world frame -->
     <!-- depth topic: depth image, 640x480 by default -->
     <!-- don't set cloud_topic if you already set these ones! -->
-    <arg name="camera_pose_topic" value="$(arg camera_pose_topic)"/>
-    <arg name="depth_topic" value="$(arg depth_topic)"/>
+    <arg name="camera_pose_topic" default="$(arg mav_name)/pose"/>
+    <arg name="depth_topic" default="$(arg mav_name)/camera/depth/image_raw"/>
 
     <!-- topic of point cloud measurement, such as from LIDAR  -->
     <!-- don't set camera pose and depth, if you already set this one! -->
@@ -71,7 +69,7 @@
     
   </include>
 
-  <include file="$(find ego_planner)/launch/rviz.launch" />
+  <include file="$(find ego_planner)/launch/rviz.launch" /> 
   
   <!-- trajectory server -->
   <node pkg="ego_planner" name="traj_server" type="traj_server" output="screen">
@@ -86,15 +84,9 @@
     <remap from="~traj_start_trigger" to="/traj_start_trigger" />
     <param name="waypoint_type" value="manual-lonely-waypoint"/>    
   </node>
-
-  <node pkg="ego_planner" name="camera_pose_publisher" type="camera_pose_publisher.py" output="screen">
-      <param name="parent_frame" value="world" />
-      <param name="child_frame" value="$(arg mav_name)/camera_box" />
-      <param name="pose_topic" value="$(arg mav_name)/camera/pose" />
-  </node>
-
+  
   <node pkg="ego_planner" name="trajectory_msg_converter" type="trajectory_msg_converter.py" output="screen">
-      <param name="fast_planner_traj_topic" value="planning/pos_cmd"/>
-      <param name="traj_pub_topic" value="$(arg mav_name)/position_hold/trajectory"/>
+    <param name="fast_planner_traj_topic" value="planning/pos_cmd"/>
+    <param name="traj_pub_topic" value="$(arg mav_name)/tracker/input_trajectory"/>
   </node>
 </launch>

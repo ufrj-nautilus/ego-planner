@@ -368,7 +368,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: red/camera/color/image_raw
+      Image Topic: red/camera/depth/image_raw
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -383,7 +383,7 @@ Visualization Manager:
     Background Color: 255; 253; 224
     Default Light: true
     Fixed Frame: world
-    Frame Rate: 30
+    Frame Rate: 50
   Name: root
   Tools:
     - Class: rviz/Interact
