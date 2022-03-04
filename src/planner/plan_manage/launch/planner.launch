@@ -37,7 +37,7 @@
     <arg name="max_acc" default="2.75" />
 
     <!--always set to 1.5 times grater than sensing horizen-->
-    <arg name="planning_horizon" value="7.5" /> 
+    <arg name="planning_horizon" value="15" /> 
 
     <!-- 1: use 2D Nav Goal to select goal  -->
     <!-- 2: use global waypoints below  -->
@@ -85,8 +85,8 @@
     <param name="waypoint_type" value="manual-lonely-waypoint"/>    
   </node>
   
-  <node pkg="ego_planner" name="trajectory_msg_converter" type="trajectory_msg_converter.py" output="screen">
-    <param name="fast_planner_traj_topic" value="planning/pos_cmd"/>
-    <param name="traj_pub_topic" value="$(arg mav_name)/tracker/input_trajectory"/>
+  <node pkg="ego_planner" name="bspline_msg_converter" type="new_traj.py" output="screen">
+    <param name="ego_planner_traj_topic" value="/planning/bspline"/>
+    <param name="traj_pub_topic" value="$(arg mav_name)/tracker/input_pose"/>
   </node>
 </launch>

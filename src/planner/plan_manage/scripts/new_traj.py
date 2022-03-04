@@ -2,54 +2,50 @@
 
 # Imports
 import rospy
-from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint,  MultiDOFJointTrajectory# for UAV position control
-from geometry_msgs.msg import Transform
+import time
+from geometry_msgs.msg import Transform, PoseStamped
 from tf.transformations import quaternion_from_euler
 from ego_planner import Bspline
-class MessageConverter:
-    def __init__(self):
-        rospy.init_node('trajectory_msg_converter')
 
+class BsplineConverter:
+    def __init__(self):
+        rospy.init_node('bspline_msg_converter')
+        
         ego_planner_traj_topic = rospy.get_param('~ego_planner_traj_topic', '/planning/bspline')
-        traj_pub_topic = rospy.get_param('~traj_pub_topic', 'red/tracker/input_trajectory')
 
         # Publisher for UAV position control
-        self.traj_pub = rospy.Publisher(traj_pub_topic, MultiDOFJointTrajectory, queue_size=1)
+        traj_pub_topic = rospy.get_param('~traj_pub_topic', 'tracker/input_pose')
 
         # Subscriber for Ego-Planner reference trajectory
-        rospy.Subscriber(ego_planner_traj_topic, Bspline, self.egoPlannerTrajCallback, tcp_nodelay=True)
+        rospy.Subscriber(ego_planner_traj_topic, Bspline, callback=self.traj_callback)
+        
+        self.pub = rospy.Publisher(traj_pub_topic, PoseStamped, queue_size=10)
+        
+    def traj_callback(self, msg):
+        pose_list = []
+        size = len(msg.pos_pts)
+        
+        for i in range(size):
+            pos = PoseStamped()
+            pos.pose.position.x = msg.pos_pts[i].x
+            pos.pose.position.y = msg.pos_pts[i].y
+            pos.pose.position.z = msg.pos_pts[i].z
 
-        rospy.spin()
+            pos.pose.orientation.x = 0
+            pos.pose.orientation.y = 0
+            pos.pose.orientation.z = 0
+            pos.pose.orientation.w = 1
 
-    def egoPlannerTrajCallback(self, msg):
+            pose_list.append(pos)
 
-        # Position - used
-        pose = Transform()
-        traj_point = MultiDOFJointTrajectory()
+        for pos in pose_list:
+            self.pub.publish(pos)
+            time.sleep(0.2)
 
-        # Yaw - Not used
-
-        # Velocity - Not used
-
-        # Acceleration - Not used
-
-        if(msg.traj_id == 1):
-          previous_traj_id = msg.traj_id - 1
-
-        if(msg.traj_id == previous_traj_id + 1):
-          for i in msg.pos_pts:
-            pose.translation.x = msg.pos_pts.x
-            pose.translation.y = msg.pos_pts.y
-            pose.translation.z = msg.pos_pts.z
-
-            traj_point.transforms.append(pose)
-
-          self.traj_pub.publish(traj_point)
-          previous_traj_id += 1
 
 if __name__ == '__main__':
-    obj = MessageConverter()
-
+    obj = BsplineConverter()
+    rospy.spin()
 
 """ rostopic echo -n1 /planning/bspline - 
 
@@ -119,33 +115,4 @@ pos_pts:
     z: 0.980794827258877
 yaw_pts: []
 yaw_dt: 0.0
----
-
-/pos_cmd
-header: 
-  seq: 998
-  stamp: 
-    secs: 1636749300
-    nsecs: 458358945
-  frame_id: "world"
-position: 
-  x: -9.28099878117878
-  y: -8.688725040383979
-  z: 0.9997694852660133
-velocity: 
-  x: 0.0
-  y: 0.0
-  z: 0.0
-acceleration: 
-  x: 0.0
-  y: 0.0
-  z: 0.0
-yaw: -1.364799524977911
-yaw_dot: 0.0
-kx: [5.7, 5.7, 6.2]
-kv: [3.4, 3.4, 4.0]
-trajectory_id: 9
-trajectory_flag: 1
---- Tipo: PositionCommand
-
-"""
+---"""
