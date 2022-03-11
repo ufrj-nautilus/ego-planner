@@ -16,29 +16,33 @@ class BsplineConverter:
       # Publisher for UAV position control
       traj_pub_topic = rospy.get_param('~traj_pub_topic', '/red/tracker/input_trajectory')
 
+      self.counter = 0
+      
       # Subscriber for Ego-Planner reference trajectory
       rospy.Subscriber(ego_planner_traj_topic, Bspline, callback=self.traj_callback)
-      
+
       self.pub = rospy.Publisher(traj_pub_topic, MultiDOFJointTrajectory, queue_size=10)
   
     def traj_callback(self, msg):
       multi_dof_trajectory = MultiDOFJointTrajectory()
-      print("LENGTH MSG.POS_PTS", len(msg.pos_pts))
-      for i in range(len(msg.pos_pts)):
-        temp_point = MultiDOFJointTrajectoryPoint()
-        temp_transform = Transform()
-        temp_transform.translation.x = msg.pos_pts[i].x
-        temp_transform.translation.y = msg.pos_pts[i].y
-        temp_transform.translation.z = msg.pos_pts[i].z
-        temp_transform.rotation.x = 0.0
-        temp_transform.rotation.y = 0.0
-        temp_transform.rotation.z = 0.0
-        temp_transform.rotation.w = 1.0
 
-        temp_point.transforms.append(temp_transform)
-        multi_dof_trajectory.points.append(temp_point)
+      print("----------NUMBER OF CALLBACKS-------------", self.counter)
 
-      self.pub.publish(multi_dof_trajectory)
+      print("----------LENGTH MSG.POS_PTS----------", len(msg.pos_pts))
+      if self.counter == 0:
+        for i in range(len(msg.pos_pts)):
+          temp_point = MultiDOFJointTrajectoryPoint()
+          temp_transform = Transform()
+          temp_transform.translation.x = msg.pos_pts[i].x
+          temp_transform.translation.y = msg.pos_pts[i].y
+          temp_transform.translation.z = msg.pos_pts[i].z
+          temp_transform.rotation.w = 1.0
+
+          temp_point.transforms.append(temp_transform)
+          multi_dof_trajectory.points.append(temp_point)
+
+        self.counter += 1
+        self.pub.publish(multi_dof_trajectory)
 
 if __name__ == '__main__':
     rospy.init_node('bspline_msg_converter')
