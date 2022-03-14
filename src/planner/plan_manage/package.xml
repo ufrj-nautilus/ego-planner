@@ -55,7 +55,7 @@
   
   <build_depend>plan_env</build_depend>
   <build_depend>path_searching</build_depend>
-  <build_depend>_opt</build_depend>
+  <build_depend>bspline_opt</build_depend>
   <build_depend>traj_utils</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
