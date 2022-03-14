@@ -85,8 +85,8 @@
     <param name="waypoint_type" value="manual-lonely-waypoint"/>    
   </node>
   
-  <node pkg="ego_planner" name="bspline_msg_converter" type="new_traj.py" output="screen">
-    <param name="ego_planner_traj_topic" value="/planning/bspline"/>
-    <param name="traj_pub_topic" value="$(arg mav_name)/tracker/input_pose"/>
+  <node pkg="ego_planner" name="pos_command_msg_converter" type="new_traj.py" output="screen">
+    <param name="ego_planner_traj_topic" value="/planning/pos_cmd"/>
+    <param name="traj_pub_topic" value="$(arg mav_name)/position_hold/trajectory"/>
   </node>
 </launch>
