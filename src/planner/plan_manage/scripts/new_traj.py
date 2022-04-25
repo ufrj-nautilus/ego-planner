@@ -15,7 +15,8 @@ class PositionCommandConverter:
       ego_planner_traj_topic = rospy.get_param('~ego_planner_traj_topic', 'planning/pos_cmd')
 
       self.counter = 0
-
+      self.kill = False
+      
       # Publisher for UAV position control
       traj_pub_topic = rospy.get_param('~traj_pub_topic', '/red/position_hold/trajectory')
 
