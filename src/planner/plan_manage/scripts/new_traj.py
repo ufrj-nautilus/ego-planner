@@ -6,6 +6,7 @@ from quadrotor_msgs.msg import PositionCommand
 from tf.transformations import quaternion_from_euler
 from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint
 from geometry_msgs.msg import Transform, Twist
+from std_msgs.msg import Bool
 
 class PositionCommandConverter:
     def __init__(self):
@@ -21,7 +22,9 @@ class PositionCommandConverter:
       # Subscriber for Ego-Planner reference trajectory
       rospy.Subscriber(ego_planner_traj_topic, PositionCommand, callback=self.traj_callback)
 
-      self.pub = rospy.Publisher(traj_pub_topic, MultiDOFJointTrajectoryPoint, queue_size=100)
+      self.pub = rospy.Publisher(traj_pub_topic, MultiDOFJointTrajectoryPoint, queue_size=10)
+
+      rospy.Subscriber("/red/kill_traj_planner", Bool, callback=self.kill_callback)
 
       rospy.spin()
   
@@ -51,11 +54,17 @@ class PositionCommandConverter:
       traj_point.time_from_start.secs = 0
       traj_point.time_from_start.nsecs = 0
 
-      print("Counter: ", self.counter)
-      print("Msg.position.x: ", msg.position.x)
+      #print("Counter: ", self.counter)
+      #print("Msg.position.x: ", msg.position.x)
 
-      self.pub.publish(traj_point)
-      
+      if(self.kill == False):
+        self.pub.publish(traj_point)
+
+    def kill_callback(self, msg):
+        if msg.data == True:
+          self.kill = True
+        else:
+          self.kill = False      
 
 if __name__ == '__main__':
     obj = PositionCommandConverter()
